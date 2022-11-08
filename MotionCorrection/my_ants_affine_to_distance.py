@@ -25,7 +25,7 @@ def my_ants_affine_to_distance(affine, unit):
     
     rot_y = np.arcsin(affine[2])
     cos_rot_y = np.cos(rot_y)
-    rot_x = np.arctan2(affine[8] / cos_rot_y, affine[8] / cos_rot_y)
+    rot_x = np.arctan2(affine[4] / cos_rot_y, affine[8] / cos_rot_y)
     rot_z = np.arctan2(affine[2] / cos_rot_y, affine[0] / cos_rot_y)
 
     if unit == 'deg':
