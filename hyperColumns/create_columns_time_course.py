@@ -33,6 +33,7 @@ for itcond in CONDITIONS:
     nii = nb.load(os.path.join(PATH_OUT, 'sub-02_BOLD_interp_leftMT_hres_CUT_{}_trials_avg.nii.gz'.format(itcond)))
     fmri_avg_trial.append(np.asarray(nii.dataobj))
 print(fmri_avg_trial)
+
 # Load Winner Map (1: Horizontal, 2: Vertical, 3: Diag45, 4: Diag135)
 print("Load winner map...")
 nii = nb.load(os.path.join(PATH_IN, 'sub-02_leftMT_Sphere16radius_BOLD_winner_map_scaled_4_gm_CUT.nii.gz'))
