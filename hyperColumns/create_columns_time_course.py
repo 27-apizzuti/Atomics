@@ -48,9 +48,9 @@ elif WINN_COND == "Diag45":
 else:
     idx_win_map = (win_map == 4)
 
-# Load statistical mask: BOLD FDR threshold (or BOLD FDR + cross-validation: sub-02_leftMT_Sphere16radius_BOLD_CV_AVG_mask_scaled_4_gm_CUT.nii.gz)
+# Load statistical mask: BOLD FDR threshold (or BOLD FDR + cross-validation: sub-02_leftMT_Sphere16radius_BOLD_CV_AVG_mask_scaled_4_gm_CUT.nii.gz 'sub-02_leftMT_Sphere16radius_BOLD_FDR_mask_scaled_4_gm_CUT.nii.gz')
 print("Load statistical mask...")
-nii = nb.load(os.path.join(PATH_IN, 'binary_masks', 'sub-02_leftMT_Sphere16radius_BOLD_FDR_mask_scaled_4_gm_CUT.nii.gz'))
+nii = nb.load(os.path.join(PATH_IN, 'binary_masks', 'sub-02_leftMT_Sphere16radius_BOLD_CV_AVG_mask_scaled_4_gm_CUT.nii.gz'))
 stat_mask = np.asarray(nii.dataobj)
 idx_stat = stat_mask > 0
 
@@ -67,18 +67,23 @@ idx_lay3 = layers == 3
 # sub-02_leftMT_Sphere16radius_BOLD_specificity_map_scaled_4_gm_CUT.nii.gz,
 # sub-02_leftMT_Sphere16radius_BOLD_FDR_BOLD_columns_full_depth_UVD_columns_mode_filter_CUT.nii.gz
 
+print("Load extra masks...")
+nii = nb.load(os.path.join(PATH_IN, 'sub-02_leftMT_Sphere16radius_BOLD_FDR_BOLD_columns_full_depth_UVD_columns_mode_filter_CUT.nii.gz'))
+extra_mask =  np.asarray(nii.dataobj)
+idx_extra_mask = extra_mask > 0.5
+
 # Voxel selection per layer
 fmri_condition_layers = []
 for itcond, cond in enumerate(CONDITIONS):
     fmri_layers = []
-    fmri_layers.append(fmri_avg_trial[itcond][idx_win_map * idx_stat * idx_lay1])
-    fmri_layers.append(fmri_avg_trial[itcond][idx_win_map * idx_stat * idx_lay2])
-    fmri_layers.append(fmri_avg_trial[itcond][idx_win_map * idx_stat * idx_lay3])
+    fmri_layers.append(fmri_avg_trial[itcond][idx_win_map * idx_stat * idx_lay1 * idx_extra_mask])
+    fmri_layers.append(fmri_avg_trial[itcond][idx_win_map * idx_stat * idx_lay2 * idx_extra_mask])
+    fmri_layers.append(fmri_avg_trial[itcond][idx_win_map * idx_stat * idx_lay3 * idx_extra_mask])
     fmri_condition_layers.append(fmri_layers)
 
-print("Number of voxels for layer 1: {}".format(np.sum(idx_win_map * idx_stat * idx_lay1)))
-print("Number of voxels for layer 2: {}".format(np.sum(idx_win_map * idx_stat * idx_lay2)))
-print("Number of voxels for layer 3: {}".format(np.sum(idx_win_map * idx_stat * idx_lay3)))
+print("Number of voxels for layer 1: {}".format(np.sum(idx_win_map * idx_stat * idx_lay1 * idx_extra_mask)))
+print("Number of voxels for layer 2: {}".format(np.sum(idx_win_map * idx_stat * idx_lay2 * idx_extra_mask)))
+print("Number of voxels for layer 3: {}".format(np.sum(idx_win_map * idx_stat * idx_lay3 * idx_extra_mask)))
 
 # Plot results
 my_dpi = 96
@@ -99,7 +104,7 @@ for itcond, cond in enumerate(CONDITIONS):
 
 # plt.suptitle('Winning condition: {}'.format(WINN_COND))
 plt.tight_layout()
-plt.savefig(os.path.join(PATH_OUT, 'plot_layers_time_{}.jpg'.format(WINN_COND)), bbox_inches = 'tight', dpi=my_dpi)
+plt.savefig(os.path.join(PATH_OUT, 'plot_layers_time_{}_CV_extramask.jpg'.format(WINN_COND)), bbox_inches = 'tight', dpi=my_dpi)
 
 # Save numpy
-np.save(os.path.join(PATH_OUT, 'layer_condition_fmr'), fmri_condition_layers, allow_pickle=True)
+np.save(os.path.join(PATH_OUT, 'layer_condition_fmr_CV_extramask'), fmri_condition_layers, allow_pickle=True)
